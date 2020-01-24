@@ -124,7 +124,7 @@ class PhotosController extends Controller
         
         
             $photoUp->local = $validatedData['local'];
-            $photoUp->local = $validatedData['pictureDate'];
+            $photoUp->pictureDate = $validatedData['pictureDate'];
             $photoUp->fileUpload = $profileImage;
             //dd($photoUp);
             $photoUp->update();
