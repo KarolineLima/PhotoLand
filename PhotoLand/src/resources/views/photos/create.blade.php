@@ -1,9 +1,9 @@
-@extends('app')
+@extends('layout')
 
 @section('title', 'New Photo')
 
 @section('content')
-<div style="width: 45%;margin: auto;"> 
+<div style="width: 45%;margin: auto;">
 
 
     <div class="card">
@@ -20,7 +20,8 @@
                 </ul>
             </div>
             @endif
-            <form method="post" action="{{ route('photos.store') }}">
+            
+            <form method="post" enctype="multipart/form-data" accept-charset="utf-8" action="{{ route('photos.store')}}">
                 @csrf
 
                 <div class="form-group">
@@ -32,12 +33,12 @@
                     <input type="text" class="form-control" id="pictureDate" name="pictureDate" />
                 </div>
 
-                <form>
-                    <div class="form-group">
-                        <label for="fileUpload">Selecione a Foto</label>
-                        <input type="file" class="form-control-file" id="fileUpload" name="fileUpload">
-                    </div>
-                </form>
+
+                <div class="form-group">
+                    <label for="fileUpload">Selecione a Foto</label>
+                    <input type="file" class="form-control-file" id="fileUpload" name="fileUpload">
+                </div>
+
                 <button type="submit" class="btn btn-primary">Add Photo</button>
             </form>
         </div>

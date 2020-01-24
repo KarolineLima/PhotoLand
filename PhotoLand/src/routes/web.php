@@ -17,6 +17,8 @@ Route::get('/', function () {
     return redirect(route('photos.index'));;
 });
 
+
+
 Route::resource('photos', 'PhotosController');
 
 // Route::get('/', function () {

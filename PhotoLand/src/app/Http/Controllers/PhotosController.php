@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Photo;
+use App\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class PhotosController extends Controller
 {
@@ -12,12 +14,13 @@ class PhotosController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+
     public function index()
     {
         $photos = Photo::all();
         return view('photos.index', compact('photos'));
     }
-
+    
     /**
      * Show the form for creating a new resource.
      *
@@ -36,7 +39,9 @@ class PhotosController extends Controller
      */
     public function store(Request $request)
     {
-
+        $photo = new Photo;
+        $photo->user_id = Auth::id();
+        $photo->fotografo = Auth::user()->name;
 
         $validatedData = $request->validate([
             'local' => 'required|max:255',
@@ -45,15 +50,22 @@ class PhotosController extends Controller
             
         ]);
 
+        //dd($request->file('fileUpload'));
+        
         if ($files = $request->file('fileUpload')) {
             $destinationPath = 'public/image/'; // upload path
-            $profileImage = $validatedData->local . "." . $files->getClientOriginalExtension();
-            $files->move($destinationPath, $profileImage);
-            $insert['image'] = "$profileImage";
+            $profileImage = $validatedData['local'] . "." . $files->getClientOriginalExtension();
+            $path = $request->file('fileUpload')->storeAs('photos',$profileImage);
+            // dd($path);
+        
+         
+            $photo->local = $validatedData['local'];
+            $photo->pictureDate = $validatedData['pictureDate'];
+            $photo->fileUpload = $profileImage;
+            $photo->save();
+           // dd($photo);
          }
 
-        dd($validatedData);
-        Photo::create($validatedData);
 
         return redirect(route('photos.index'))->with('success', 'Photo is successfully saved');
     }
@@ -78,7 +90,8 @@ class PhotosController extends Controller
     public function edit(Photo $photo)
     {
         $photo = Photo::findOrFail($photo->id);
-        return view('photo.edit', compact('photos'));
+        return view('photos.edit', compact('photo'));
+        
     }
 
     /**
@@ -90,13 +103,33 @@ class PhotosController extends Controller
      */
     public function update(Request $request, Photo $photo)
     {
+        
+        $photoUp = Photo::findOrFail($photo->id);
+
+
         $validatedData = $request->validate([
             'local' => 'required|max:255',
             'pictureDate' => 'required|max:255',
+            'fileUpload' => 'required|image|mimes:jpeg,png,jpg,gif,svg',
             
         ]);
-
-        Photo::whereId($photo->id)->update($validatedData);
+        
+        //dd($validatedData);
+        if ($files = $request->file('fileUpload')) {
+            $destinationPath = 'public/image/'; // upload path
+            $profileImage = $validatedData['local'] . "." . $files->getClientOriginalExtension();
+            //dd($profileImage);
+            $path = $request->file('fileUpload')->storeAs('photos',$profileImage);
+            //dd($path);
+        
+        
+            $photoUp->local = $validatedData['local'];
+            $photoUp->local = $validatedData['pictureDate'];
+            $photoUp->fileUpload = $profileImage;
+            //dd($photoUp);
+            $photoUp->update();
+           
+         }
 
         return redirect(route('photos.index'))->with('success', 'Photo is successfully saved');
     }
@@ -112,7 +145,7 @@ class PhotosController extends Controller
         $photo = Photo::findOrFail($photo->id);
         $photo->delete();
 
-        return redirect(route('photo.index'))->with('success', 'Photo is successfully deleted');
+        return redirect(route('photos.index'))->with('success', 'Photo is successfully deleted');
     
     }
 }

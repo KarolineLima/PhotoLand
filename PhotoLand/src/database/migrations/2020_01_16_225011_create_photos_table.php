@@ -15,10 +15,13 @@ class CreatePhotosTable extends Migration
     {
         Schema::create('photos', function (Blueprint $table) {
             $table->bigIncrements('id');
+            $table->unsignedBigInteger('user_id');
+            $table->string('fotografo');
             $table->string('local');
             $table->string('pictureDate');
             $table->string('fileUpload');
             $table->timestamps();
+            $table->foreign('user_id')->references('id')->on('users');
         });
     }
 
